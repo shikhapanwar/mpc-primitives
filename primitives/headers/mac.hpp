@@ -40,6 +40,11 @@
 */
 class Mac {
 public:
+
+	Mac()
+	{
+		
+	}
 	/**
 	* Sets the secret key for this mac.
 	* The key can be changed at any time.
@@ -51,7 +56,11 @@ public:
 	* An object trying to use an instance of mac needs to check if it has already been initialized.
 	* @return true if the object was initialized by calling the function setKey.
 	*/
-	virtual bool isKeyDefined();
+	virtual bool isKeyDefined(){
+
+		//return false;
+
+	}
 
 	/**
 	* Returns the name of this mac algorithm.

@@ -181,7 +181,7 @@ public:
 * Marker class. Every class that derives it is signed as TripleDes.
 * TripleDes is a blockCipher with fixed input and output lengths and thus implements the interface PrpFixed.
 */
-class TripleDES : public virtual PrpFixed {};
+class _3DES : public virtual PrpFixed {};
 
 /**
 * This class implements some common functionality of PrpFixed by having an instance of prfFixed.

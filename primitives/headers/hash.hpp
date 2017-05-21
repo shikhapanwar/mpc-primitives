@@ -29,6 +29,8 @@
 #ifndef CRISMPC_HASH_H
 #define CRISMPC_HASH_H
 
+#include <openssl/evp.h>
+#include <set>
 #include "exception.hpp"
 #include "securitynotion.hpp"
 
@@ -39,12 +41,12 @@
 * finally the adversary outputs some y (not equal to x) such that H_K(x)=H_K(y).<p>
 * Observe that this notion is of relevance for KEYED hash functions (note that the key is public, but randomly chosen).
 */
-class TargetCollisionResistant : HashSecurity {};
+class TargetCollisionResistantHash : HashSecurity {};
 
 /**
 * A hash function H is collision resistant if it is infeasible to find two distinct values x and y such that H(x)=H(y).
 */
-class CollisionResistant : TargetCollisionResistant {};
+class CollisionResistantHash : TargetCollisionResistantHash {};
 
 /**
 * Abstract class for CryptographicHash. Every concrete class should derive this class. <p>
@@ -78,7 +80,7 @@ public:
 	* @param out the output in byte vector.
 	* @param outOffset the offset which to put the result bytes from.
 	*/
-	virtual void hashFinal(vector<byte> &out, int outOffset)=0;
+	virtual void outputHash(vector<byte> &out, int outOffset)=0;
 
 	/**
 	* Factory method. Create concrete instance of the give algorithm name in the default implementation. 
@@ -89,10 +91,89 @@ public:
 /*****************************************************************
 * SHA Abstract classes. Every class that implements them is signed as SHA:
 ******************************************************************/
-class SHA1   : public virtual CryptographicHash, public virtual CollisionResistant {};
-class SHA224 : public virtual CryptographicHash, public virtual CollisionResistant {};
-class SHA256 : public virtual CryptographicHash, public virtual CollisionResistant {};
-class SHA384 : public virtual CryptographicHash, public virtual CollisionResistant {};
-class SHA512 : public virtual CryptographicHash, public virtual CollisionResistant {};
+class AbstractSHA1   : public virtual CryptographicHash, public virtual CollisionResistantHash {};
+class AbstractSHA224 : public virtual CryptographicHash, public virtual CollisionResistantHash {};
+class AbstractSHA256 : public virtual CryptographicHash, public virtual CollisionResistantHash {};
+class AbstractSHA384 : public virtual CryptographicHash, public virtual CollisionResistantHash {};
+class AbstractSHA512 : public virtual CryptographicHash, public virtual CollisionResistantHash {};
+
+/**
+* A general adapter class of hash for OpenSSL. <p>
+* This class implements all the functionality by passing requests to the adaptee OpenSSL functions,
+* like int SHA1_Update(SHA_CTX *c, const void *data, unsigned long len);.
+*
+* A concrete hash function such as SHA1 represented by the class OpenSSLSHA1 only passes the name of the hash in the constructor
+* to this base class.
+*/
+class Hash : public virtual CryptographicHash {
+private:
+	int hashSize;
+protected:
+	shared_ptr<EVP_MD_CTX> hash; //Pointer to the OpenSSL hash object.
+public:
+	/**
+	* Constructs the OpenSSL hash object.
+	* @param hashName - the name of the hash. This will be passed to the jni dll function createHash so it will know which hash to create.
+	*/
+	Hash(string hashName);
+
+	/**
+	* @return the size of the hashed massage in bytes.
+	*/
+	int getHashedMsgSize() override { 
+		
+		return hashSize;
+
+	};
+
+	string getAlgorithmName() override;
+
+	/**
+	* Adds the byte vector to the existing message to hash.
+	* @param in input byte vector.
+	* @param inOffset the offset within the byte array.
+	* @param inLen the length. The number of bytes to take after the offset.
+	* */
+	void updateHash(const vector<byte> &in, int inOffset, int inLen) override;
+
+	/**
+	* Completes the hash computation and puts the result in the out vector.
+	* @param out the output in byte vector.
+	* @param outOffset the offset which to put the result bytes from.
+	*/
+	void outputHash(vector<byte> &out, int outOffset) override;
+};
+
+/************************************************************
+* Concrete classes of cryptographicHash for different SHA. 
+* These classes wrap OpenSSL implementation of SHA*.
+*************************************************************/
+
+class SHA1 : public Hash , public AbstractSHA1 {
+public:
+	SHA1() : Hash("SHA1") {};
+};
+
+class SHA224 : public Hash, public AbstractSHA224 {
+public:
+	SHA224() : Hash("SHA224") {};
+};
+
+class SHA256 : public Hash, public AbstractSHA256{
+public:
+	SHA256() : Hash("SHA256") {};
+};
+
+class SHA384 : public Hash, public AbstractSHA384 {
+public:
+	SHA384() : Hash("SHA384") {};
+};
+
+class SHA512 : public Hash, public AbstractSHA512 {
+public:
+	SHA512() : Hash("SHA512") {};
+};
+
+
 
 #endif
