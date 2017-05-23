@@ -130,19 +130,18 @@ typedef int socklen_t;
 
 #else //WIN32
 
-#include <sys/types.h>       
-#include <sys/socket.h>      
-#include <netdb.h>           
-#include <arpa/inet.h>       
-#include <unistd.h>          
-#include <netinet/in.h>   
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <netinet/tcp.h>
 #include <queue>
 
-typedef int SOCKET;
 #define INVALID_SOCKET -1
 
 #define SleepMiliSec(x)			usleep((x)<<10)
@@ -156,13 +155,10 @@ typedef int SOCKET;
 #define PadToMultiple(x, y) 		( ceil_divide(x, y) * (y))
 
 #include <cstring>
-#include <string>  
-#include <vector> 
+#include <string>
+#include <vector>
 #include <iostream>
 
 using namespace std;
 
 #endif //__TYPEDEFS_H__
-
-
-

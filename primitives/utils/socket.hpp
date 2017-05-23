@@ -29,7 +29,7 @@ class User{};
 // User class that uses TCP sockets
 class userSocket : public User{
 
-private: 
+private:
 	ADDRESS ip;
 	int portno;
 
@@ -56,7 +56,7 @@ public:
 	{
 		return portno;
 
-	}; 
+	};
 
 	//get string output for IP Address and Port No
 	string toStringIP()
@@ -80,7 +80,15 @@ public:
 
 	//method to read the data from the channel into buffer. No of bytes to be read is obtained by sizeToRead param
 	//Blocking System call
-	virtual size_t readData(byte* buffer, int sizeToRead) = 0;	
+	virtual size_t readData(byte* buffer, int sizeToRead) = 0;
+
+	int Receive(void* pBuf, uint64_t nLen, int nFlags = 0){
+			return (int)(readData((byte*)pBuf, nLen));
+	}
+
+	void Send(const void* pBuf, uint64_t nLen, int nFlags = 0)  {
+		 writeData((const byte*)pBuf, nLen);
+	}
 
 	//method to read the incoming data size
 	virtual int readDataSize();
@@ -93,9 +101,9 @@ public:
 	// Blocking system call
 	virtual void writeData(const byte* data, int size) = 0;
 
-	virtual void writeData(string s) { 
-		
-		writeData((const byte *)s.c_str(), s.size()); 
+	virtual void writeData(string s) {
+
+		writeData((const byte *)s.c_str(), s.size());
 
 	};
 
@@ -103,9 +111,9 @@ public:
 	//overloaded methods
 	virtual void writeBounded(const byte* data, int size);
 
-	virtual void writeBounded(string s) { 
-		
-		writeBounded((const byte*)s.c_str(), s.size()); 
+	virtual void writeBounded(string s) {
+
+		writeBounded((const byte*)s.c_str(), s.size());
 
 	};
 
@@ -143,7 +151,7 @@ public:
 	{
 		this->mysocket = mysocket;
 		this->P2socket = P2socket;
-	};	
+	};
 
 	//Setup duplex connection and handle connection establishment, blocking system call
 	void join(int wait = 500, int timeout = 5000) override;
@@ -153,11 +161,12 @@ public:
 
 	//Overriding method of super class to read data from the channel
 	size_t readData(byte* data, int sizeToRead) override {
-			
+
 			//call boost method read to perform read
 			return boost::asio::read(serverSocket, boost::asio::buffer(data, sizeToRead));
 
-	}	
+	}
+
 
 	//destructor
 	 ~userConnection(){
@@ -167,7 +176,7 @@ public:
 		serverSocket.close();
 		clientSocket.close();
 
-	 };	
+	 };
 
 }; //endofclass userConnection
 
@@ -182,7 +191,7 @@ private:
 	SOCKETSSL* serverSocket;
 	SOCKETSSL* clientSocket;
 	userSocket mysocket;
-	userSocket P2socket;	
+	userSocket P2socket;
 
 public:
 	//SSLUserConnection(){};
