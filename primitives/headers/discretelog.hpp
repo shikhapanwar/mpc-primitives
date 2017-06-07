@@ -28,7 +28,8 @@
 
 #pragma once
 
-#include "exception.hpp"
+//#include "exception.hpp"
+#include "common.hpp"
 #include "securitynotion.hpp"
 #include "discretemath.hpp"
 #include "configfile.hpp"

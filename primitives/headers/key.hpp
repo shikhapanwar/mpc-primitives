@@ -28,7 +28,8 @@
 #ifndef CRISMPC_KEY_H
 #define CRISMPC_KEY_H
 
-#include "exception.hpp"
+#include "common.hpp"
+//#include "exception.hpp"
 
 class Key {
 

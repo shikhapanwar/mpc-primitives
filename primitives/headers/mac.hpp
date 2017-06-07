@@ -28,7 +28,8 @@
 
 #ifndef CRISMPC_MAC_H
 #define CRISMPC_MAC_H
-#include "exception.hpp"
+#include "common.hpp"
+//#include "exception.hpp"
 #include "key.hpp"
 
 /**

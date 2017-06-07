@@ -45,6 +45,10 @@ void socketConnection::writeBounded(const byte* data, int size) {
 
 
 /*Methods of userConnection class */
+
+/*userConnection::userConnection()
+{}*/
+
 //method to write data into the channel. No of bytes to be written is specified by size param
 void userConnection::writeData(const byte* data, int size) {
 	
@@ -114,13 +118,13 @@ void userConnection::join(int wait, int timeout) {
 
 }//endofmethod
 
-/*userConnection :: ~userConnection() {
+userConnection :: ~userConnection() {
 	
 	acceptor_.close();
 	serverSocket.close();
 	clientSocket.close();
 
-}*/
+}
 
 /*Methods of SSLUserConnection class */
 //Constructor

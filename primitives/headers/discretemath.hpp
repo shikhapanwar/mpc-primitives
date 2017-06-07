@@ -26,8 +26,8 @@
 */
 
 #pragma once
-#include "exception.hpp"
-
+//#include "exception.hpp"
+#include "common.hpp"
 /**
 * This class holds general math algorithms needed by cryptographic algorithms.<p>
 * Each algorithm is represented by a static function that can be called independently from the other algorithms.

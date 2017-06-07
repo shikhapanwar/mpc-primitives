@@ -28,7 +28,9 @@
 
 #ifndef CRISMPC_PRF_H
 #define CRISMPC_PRF_H
-#include "exception.hpp"
+
+#include "common.hpp"
+//#include "exception.hpp"
 #include "mac.hpp"
 #include "securitynotion.hpp"
 //#include "math.h"

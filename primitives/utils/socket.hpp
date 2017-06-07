@@ -9,7 +9,7 @@
 #include <thread>
 #include <condition_variable>
 #include "payload.hpp"   //class definition of message body + header
-#include "../headers/exception.hpp" //contains Exception handling + debugging methods and few boost classes
+#include "../headers/common.hpp" //contains Exception handling + debugging methods and few boost classes
 
 /*rename for easy usage*/
 typedef boost::asio::io_service SERVICE;
@@ -74,10 +74,14 @@ public:
 };//endofclass userSocket
 
 
-/*Class (concrete) for implementing connection defined by socket*/
+/**
+* A simple interface that encapsulate all network operations of one peer in a two peers (or more)
+* setup.
+*/
 class socketConnection{
 public:
 
+	//virtual socketConnection(){}
 	//method to read the data from the channel into buffer. No of bytes to be read is obtained by sizeToRead param
 	//Blocking System call
 	virtual size_t readData(byte* buffer, int sizeToRead) = 0;	
@@ -113,7 +117,7 @@ public:
 	virtual void join(int sleep_between_attempts, int timeout) = 0;
 
 	//destructor
-	virtual ~socketConnection();
+	virtual ~socketConnection(){};
 
 }; //endofclass socketConnection
 
@@ -133,7 +137,7 @@ private:
 
 public:
 
-	//userConnection(){};
+	//userConnection();
 
 	//constructor
 	userConnection(SERVICE& ioService, userSocket mysocket, userSocket P2socket) :
@@ -160,14 +164,16 @@ public:
 	}	
 
 	//destructor
-	 ~userConnection(){
+	 /*~userConnection(){
 
 	 	//close open sockets
 	 	acceptor_.close();
 		serverSocket.close();
 		clientSocket.close();
 
-	 };	
+	 };	*/
+	 
+	 virtual ~userConnection();
 
 }; //endofclass userConnection
 

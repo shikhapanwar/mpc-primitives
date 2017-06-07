@@ -31,7 +31,8 @@
 
 #include <openssl/evp.h>
 #include <set>
-#include "exception.hpp"
+//#include "exception.hpp"
+#include "common.hpp"
 #include "securitynotion.hpp"
 
 /**
