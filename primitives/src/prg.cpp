@@ -29,15 +29,18 @@
 #include "../headers/prg.hpp"
 
 void PrgFromPrf::setPRGKey(SecretKey & secretKey) {
+	
 	prf->setPRFKey(secretKey); //Sets the key to the underlying prf.
 	
 	ctr = vector<byte>(prf->getPRFBlockSize());
 	// Initializes the counter to 1.
 	ctr[ctr.size() - 1] = 1;
 	this->_isKeyDefined = true;
+
 }
 
-void PrgFromPrf::getPRGBytes(vector<byte> & outBytes, int outOffset, int outLen) {
+void PrgFromPrf::streamPRGBytes(vector<byte> & outBytes, int outOffset, int outLen) {
+	
 	if (!isKeyDefined())
 		throw IllegalStateException("secret key isn't set");
 
@@ -86,9 +89,11 @@ void PrgFromPrf::getPRGBytes(vector<byte> & outBytes, int outOffset, int outLen)
 		// Increase the counter.
 		increaseCtr();
 	}
+
 }
 
 void PrgFromPrf::increaseCtr() {
+	
 	//Increase the counter by one.
 	int carry = 1;
 	int len = ctr.size();
@@ -101,6 +106,7 @@ void PrgFromPrf::increaseCtr() {
 			carry = 0;
 		ctr[i] = (byte)x;
 	}
+
 }
 
 PrgFromAES::PrgFromAES(int cachedSize, bool isStrict) : cachedSize(cachedSize), isStrict(isStrict) {
@@ -130,6 +136,7 @@ PrgFromAES::PrgFromAES(PrgFromAES && old) :
 {
 	old.cipherChunk = nullptr;
 	old.indexPlaintext = nullptr;
+
 }
 
 PrgFromAES & PrgFromAES::operator=(PrgFromAES && other)
@@ -163,9 +170,10 @@ PrgFromAES::~PrgFromAES() {
         EVP_CIPHER_CTX_cleanup(aes);
         //delete aes;
     }
+
 }
 
-SecretKey PrgFromAES::KeyGen(int keySize) {
+SecretKey PrgFromAES::keyGen(int keySize) {
 
 	//NOTE----A temp way to produce a secret key. Will be changed later
 	byte * buf = new byte[keySize / 8];
@@ -178,6 +186,7 @@ SecretKey PrgFromAES::KeyGen(int keySize) {
 	//free the dynamic buffer
 	delete[] buf;
 	return sk;
+
 }
 
 void PrgFromAES::setPRGKey(SecretKey & secretKey) {
@@ -204,22 +213,22 @@ void PrgFromAES::setPRGKey(SecretKey & secretKey) {
 		EVP_CIPHER_CTX_init(aes);
 		EVP_EncryptInit(aes, EVP_aes_128_ecb(), &(secretKey.getEncoded()).at(0), (byte *)&iv);
 		idxForBytes = 0; //makes sure the indices are starting from 0
-		prepare();
+		genRandomness();
 	}
 
 }
 
 
 
-void PrgFromAES::getPRGBytes(vector<byte> & outBytes, int outOffset, int outLen) {
+void PrgFromAES::streamPRGBytes(vector<byte> & outBytes, int outOffset, int outLen) {
 
 	//key must be set in order to get randoms
 	if (!isKeyDefined())
 		throw IllegalStateException("secret key isn't set");
 
-	//the required number of random bytes exceeds the avaliable randoms, prepare new randoms
+	//the required number of random bytes exceeds the avaliable randoms, genRandomness new randoms
 	if (outLen + idxForBytes > cachedSize * 16) {
-		prepare();
+		genRandomness();
 	}
 
 	byte* cipherInBytes = (byte*)cipherChunk;
@@ -229,6 +238,7 @@ void PrgFromAES::getPRGBytes(vector<byte> & outBytes, int outOffset, int outLen)
 
 	//increment the byte counter 
 	idxForBytes += outLen;
+
 }
 
 uint32_t PrgFromAES::getRandom32() {
@@ -237,51 +247,65 @@ uint32_t PrgFromAES::getRandom32() {
 	if (!isKeyDefined())
 		throw IllegalStateException("secret key isn't set");
 
-	//the required number of random bytes exceeds the avaliable randoms, prepare new randoms
+	//the required number of random bytes exceeds the avaliable randoms, genRandomness new randoms
 	if (idxForBytes + 4 >= cachedSize*BLOCK_SIZE) {
-		prepare();
+		genRandomness();
 	}
+
 	uint32_t* cipherInInts = (uint32_t*)cipherChunk;
 
 	idxForBytes += 4;
 	return  cipherInInts[(idxForBytes-4 + 3)/4];
+
 }
+
+
 uint64_t PrgFromAES::getRandom64() {
 
 	//key must be set in order to get randoms
 	if (!isKeyDefined())
 		throw IllegalStateException("secret key isn't set");
 
-	//the required number of random bytes exceeds the avaliable randoms, prepare new randoms
+	//the required number of random bytes exceeds the avaliable randoms, genRandomness new randoms
 	if (idxForBytes + 8 >= cachedSize*BLOCK_SIZE) {
-		prepare();
+		genRandomness();
 	}
+	
 	uint64_t* cipherInLong = (uint64_t*)cipherChunk;
 
 	idxForBytes += 8;
 	return  cipherInLong[(idxForBytes-8 + 7) / 8];
+
 }
+
+
 block PrgFromAES::getRandom128() {
 
 	//key must be set in order to get randoms
 	if (!isKeyDefined())
 		throw IllegalStateException("secret key isn't set");
-	//the required number of random bytes exceeds the avaliable randoms, prepare new randoms
+	
+	//the required number of random bytes exceeds the avaliable randoms, genRandomness new randoms
 	if (idxForBytes + 16 >= cachedSize*BLOCK_SIZE) {
-		prepare();
+		genRandomness();
 	}
+
 	idxForBytes += 16;
+
 	return  cipherChunk[(idxForBytes - 16 + 15) / 16];
+
 }
 
 
-void PrgFromAES::prepare() {
+void PrgFromAES::genRandomness() {
 
 	if (isStrict == true)
 		throw overflow_error("No randoms left for a strict class");
+	
 	//set the starting point of the index. We want the ceiling of the division by 16
 	startingIndex = (idxForBytes + 16 - 1) / 16;
 	long *plaintextArray = (long *)indexPlaintext;
+	
 	//go over the array and set the long for evey other long, we use only half of the 128 bit variables
 	for (long i = 0; i < cachedSize; i++) {
 		plaintextArray[i * 2 + 1] = startingIndex + i;
@@ -292,6 +316,7 @@ void PrgFromAES::prepare() {
 	EVP_EncryptUpdate(aes, (byte *)cipherChunk, &outLength, (byte *)indexPlaintext, cachedSize*16);
 
 	idxForBytes = 0;
+	
 }
 
 

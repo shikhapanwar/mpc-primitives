@@ -1,34 +1,4 @@
-/**
-* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-* 
-* Copyright (c) 2017 MPC-PRIMITIVES ()
-* This file is part of the MPC-PRIMTIVES project.
-* DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
-* 
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
-* to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-* and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-* 
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-* 
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-* FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-* 
-* We request that any publication and/or code referring to and/or based on MPC-PRIMTIVES contain an appropriate citation to MPC-PRIMITIVES, including a reference to
-* 
-* 
-* MPC-PRIMITIVES uses several open source libraries. Please see these projects for any further licensing issues.
-* For more information , See https://raw.githubusercontent.com/cris-iisc/mpc-primitives/master/LICENSE.MD
-*
-* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-* 
-*/
-#ifndef EXCEPTION_H
-#define EXCEPTION_H
-
-
-//#pragma once
+#pragma once
 
 #define WIN32_LEAN_AND_MEAN
 
@@ -60,54 +30,67 @@
 
 using namespace std;
 
-class IllegalStateException : public logic_error{
-
+class IllegalStateException : public logic_error
+{
 public:
 	IllegalStateException(const string & msg) : logic_error(msg) {};
-
 };
 
-class NotImplementedException : public logic_error{
-
+class NotImplementedException : public logic_error
+{
 public:
 	NotImplementedException(const string & msg) : logic_error(msg) {};
-
 };
 
-class InvalidKeyException : public logic_error{
-
+class InvalidKeyException : public logic_error
+{
 public:
 	InvalidKeyException(const string & msg) : logic_error(msg) {};
-
 };
 
-class KeyException : public logic_error{
-
+class KeyException : public logic_error
+{
 public:
 	KeyException(const string & msg) : logic_error(msg) {};
-
 };
 
-class UnsupportedOperationException : public logic_error{
-
+class UnsupportedOperationException : public logic_error
+{
 public:
 	UnsupportedOperationException(const string & msg) : logic_error(msg) {};
-
 };
 
-class SecurityLevelException : public logic_error{
-
+class SecurityLevelException : public logic_error
+{
 public:
 	SecurityLevelException(const string & msg) : logic_error(msg) {};
-
 };
 
-class CheatAttemptException : public logic_error{
-
+class CheatAttemptException : public logic_error
+{
 public:
 	CheatAttemptException(const string & msg) : logic_error(msg) {};
-
 };
+
+class TimeoutException : public logic_error
+{
+public:
+	TimeoutException(const string & msg) : logic_error(msg) {};
+};
+
+class DuplicatePartyException : public logic_error
+{
+public:
+	DuplicatePartyException(const string & msg) : logic_error(msg) {};
+};
+
+class PartyCommunicationException : public logic_error
+{
+public:
+	PartyCommunicationException(const string & msg) : logic_error(msg) {};
+};
+
+
 
 // using boost::multiprecision:cpp_int - Arbitrary precision integer type.
 namespace mp = boost::multiprecision;     // reduce the typing a bit later...
@@ -135,9 +118,6 @@ class PrgFromAES;
 shared_ptr<PrgFromAES> get_seeded_prg();
 
 void copy_byte_vector_to_byte_array(const vector<byte> &source_vector, byte * dest, int beginIndex);
-
-
-
 void copy_byte_array_to_byte_vector(const byte* src, int src_len, vector<byte>& target_vector, int beginIndex);
 
 /*
@@ -182,18 +162,13 @@ void gen_random_bytes_vector(vector<byte> &v, const int len, PrgFromAES* random)
 * Abstract marker interface that allow serialization and deserialization from byte array and size
 */
 class NetworkSerialized {
-
 public:
 	virtual string toString() = 0;
 	virtual void initFromString(const string & raw) = 0;
-
 	virtual void initFromByteVector(const vector<byte> & byteVector) {
 		const byte * uc = &(byteVector[0]);
 		std::string s(reinterpret_cast<char const*>(uc), byteVector.size());
 		initFromString(s);
 	}
-	
 };
 
-
-#endif

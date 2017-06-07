@@ -135,12 +135,12 @@ public:
 	};
 
 	//Get methods for accessing private members
-	PublicKey * GetPublic() { 
+	PublicKey * getPublic() { 
 		return publicKey; 
 
 	};
 
-	PrivateKey * GetPrivate() { 
+	PrivateKey * getPrivate() { 
 		return privateKey; 
 	};
 

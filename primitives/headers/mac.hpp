@@ -78,14 +78,14 @@ public:
 	* @return the generated secret key.
 	* @throws InvalidParameterSpecException if the given keyParams does not match this mac algoithm.
 	*/
-	virtual SecretKey KeyGen(AlgorithmParameterSpec & keyParams) = 0 ;
+	virtual SecretKey keyGen(AlgorithmParameterSpec & keyParams) = 0 ;
 
 	/**
 	* Generates a secret key to initialize this mac object.
 	* @param keySize is the required secret key size in bits.
 	* @return the generated secret key.
 	*/
-	virtual SecretKey KeyGen(int keySize)=0;
+	virtual SecretKey keyGen(int keySize)=0;
 
 	/**
 	* Computes the mac operation on the given msg and return the calculated tag.
@@ -94,7 +94,7 @@ public:
 	* @param msgLen the length of the message in bytes.
 	* @return the return tag from the mac operation.
 	*/
-	virtual vector<byte> MacSign(const vector<byte> &msg, int offset, int msgLen) = 0;
+	virtual vector<byte> macSign(const vector<byte> &msg, int offset, int msgLen) = 0;
 
 	/**
 	* Verifies that the given tag is valid for the given message.
@@ -104,7 +104,7 @@ public:
 	* @param tag the tag to verify.
 	* @return true if the tag is the result of computing mac on the message. false, otherwise.
 	*/
-	virtual bool MacVerify(const vector<byte> &msg, int offset, int msgLength, vector<byte>& tag)=0;
+	virtual bool macVerify(const vector<byte> &msg, int offset, int msgLength, vector<byte>& tag)=0;
 
 	/**
 	* Adds the byte array to the existing message to mac.
@@ -112,7 +112,7 @@ public:
 	* @param offset the offset within the message array to take the bytes from.
 	* @param msgLen the length of the message in bytes.
 	*/
-	virtual void UpdateMac(vector<byte> & msg, int offset, int msgLen) = 0 ;
+	virtual void updateMac(vector<byte> & msg, int offset, int msgLen) = 0 ;
 
 	/**
 	* Completes the mac computation and puts the result tag in the tag array.
@@ -121,7 +121,7 @@ public:
 	* @param msgLength the length of the message in bytes.
 	* @param output - the result tag from the mac operation.
 	*/
-	virtual void doFinal(vector<byte> & msg, int offset, int msgLength, vector<byte> & tag_res) = 0;
+	virtual void macToTag(vector<byte> & msg, int offset, int msgLength, vector<byte> & tag_res) = 0;
 };
 
 /**

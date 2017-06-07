@@ -63,13 +63,13 @@ public:
 	/**
 	* This class does not need parameters to generate a key. Call the other generateKey function that accept the key size.
 	*/
-	SecretKey KeyGen(AlgorithmParameterSpec & keyParams) override {
+	SecretKey keyGen(AlgorithmParameterSpec & keyParams) override {
 		
-		throw NotImplementedException("To generate a key for this prf object use the KeyGen(int keySize) function");
+		throw NotImplementedException("To generate a key for this prf object use the keyGen(int keySize) function");
 	
 	};
 
-	SecretKey KeyGen(int keySize) override;
+	SecretKey keyGen(int keySize) override;
 
 	/**
 	* Computes the function using the secret key.
@@ -132,7 +132,7 @@ public:
 	* @param outBytes output bytes. The resulted bytes of invert
 	* @param outOff output offset in the outBytes array to put the result from
 	*/
-	void invertBlock(const vector<byte> & inBytes, int inOff, vector<byte>& outBytes, int outOff) override;
+	void invertPRFBlock(const vector<byte> & inBytes, int inOff, vector<byte>& outBytes, int outOff) override;
 	
 	/**
 	* Inverts the permutation on the given vector.
@@ -143,7 +143,7 @@ public:
 	* @param inBytes input bytes to invert.
 	* @param outBytes output bytes. The inverted bytes.
 	*/
-	void optimizedInvert(const vector<byte> & inBytes, vector<byte> &outBytes);
+	void optimizedInvertBlock(const vector<byte> & inBytes, vector<byte> &outBytes);
 
 	/**
 	* Inverts the permutation using the given key.
@@ -155,8 +155,10 @@ public:
 	* @param outOff output offset in the outBytes array to put the result from
 	* @param len the length of the input and the output
 	*/
-	void invertBlock(const vector<byte> & inBytes, int inOff, vector<byte>& outBytes, int outOff, int len) override;
+	void invertPRFBlock(const vector<byte> & inBytes, int inOff, vector<byte>& outBytes, int outOff, int len) override;
+	
 	virtual ~PrfPRP();
+
 };
 
 
@@ -182,6 +184,7 @@ public:
 	int getPRFBlockSize() override { return 16; };
 
 	virtual ~OpenSSLAES() {};
+	
 };
 
 
@@ -261,24 +264,33 @@ public:
 	*/
 	void computePRFBlock(const vector<byte> & inBytes, int inOffset, int inLen, vector<byte> &outBytes, int outOffset) override;
 	
-	SecretKey KeyGen(AlgorithmParameterSpec & keyParams) override {
-		throw NotImplementedException("To generate a key for this HMAC object use the KeyGen(int keySize) function");
+	SecretKey keyGen(AlgorithmParameterSpec & keyParams) override {
+		
+		throw NotImplementedException("To generate a key for this HMAC object use the keyGen(int keySize) function");
+	
 	};
 	
-	SecretKey KeyGen(int keySize) override;
+	SecretKey keyGen(int keySize) override;
 	
 	int getMacInputBlockSize() override { return getPRFBlockSize(); };
-	virtual vector<byte> MacSign(const vector<byte> &msg, int offset, int msgLen) override;
-	virtual bool MacVerify(const vector<byte> &msg, int offset, int msgLength, vector<byte>& tag) override;
-	virtual void UpdateMac(vector<byte> & msg, int offset, int msgLen) override;
-	virtual void doFinal(vector<byte> & msg, int offset, int msgLength, vector<byte> & tag_res) override;
+	
+	virtual vector<byte> macSign(const vector<byte> &msg, int offset, int msgLen) override;
+	
+	virtual bool macVerify(const vector<byte> &msg, int offset, int msgLength, vector<byte>& tag) override;
+	
+	virtual void updateMac(vector<byte> & msg, int offset, int msgLen) override;
+	
+	virtual void macToTag(vector<byte> & msg, int offset, int msgLength, vector<byte> & tag_res) override;
+	
 	~OpenSSLHMAC();
+
 };
 
 /**
 * Concrete class of PRF family for Triple DES. This class wraps the implementation of OpenSSL library.
 */
 class OpenSSLTripleDES : public PrfPRP, public _3DES {
+
 public:
 	/**
 	* Default constructor that creates the TripleDES objects. Uses default implementation of SecureRandom.
@@ -287,6 +299,7 @@ public:
 	void setPRFKey(SecretKey & secretKey) override;
 	string getAlgorithmName() override{ return "TripleDES"; };
 	int getPRFBlockSize() override { return 8; }; // TripleDES works on 64 bit block.
+
 };
 
 #endif

@@ -11,6 +11,7 @@
 * every time it receives that query.
 */
 class RandomOracle {
+
 public:	
 	/**
 	* @return the name of this Random Oracle algorithm.
@@ -25,17 +26,23 @@ public:
 	* @param outLen required output length IN BYTES.
 	* @return a string with the required length.
 	*/
-	virtual void compute(const vector<byte> & input, int inOffset, int inLen, vector<byte> & output, int outLen) = 0;
+	virtual void computeRO(const vector<byte> & input, int inOffset, int inLen, vector<byte> & output, int outLen) = 0;
+
 };
+
 
 /**
 * Concrete class of random oracle based on CryptographicHash.
 */
 class HashBasedRO : public RandomOracle {
+
 private:
 	shared_ptr<CryptographicHash> hash; //The underlying object used to compute the random oracle function.
+
 public:
+	
 	HashBasedRO(const shared_ptr<CryptographicHash> & hash = make_shared<SHA256>()) { this->hash = hash; };
+	
 	HashBasedRO(string hashName) : HashBasedRO(CryptographicHash::get_new_cryptographic_hash(hashName)) {};
 	
 	/**
@@ -46,14 +53,19 @@ public:
 	* @param outLen required output length IN BYTES.
 	* @return a string with the required length.
 	*/
-	void compute(const vector<byte> & input, int inOffset, int inLen, vector<byte> & output, int outLen) override;
+	void computeRO(const vector<byte> & input, int inOffset, int inLen, vector<byte> & output, int outLen) override;
+	
 	string getAlgorithmName() override { return "HashBasedRO"; };
+
 };
+
+
 
 /**
 * Concrete class of random oracle based on HKDF.
 */
 class HKDFBasedRO : public RandomOracle {
+
 private:
 	shared_ptr<HKDF> hkdf; //The underlying object used to compute the random oracle function.
 
@@ -68,6 +80,8 @@ public:
 	* @param outLen required output length IN BYTES.
 	* @return a string with the required length.
 	*/
-	void compute(const vector<byte> & input, int inOffset, int inLen, vector<byte> & output, int outLen) override;
+	void computeRO(const vector<byte> & input, int inOffset, int inLen, vector<byte> & output, int outLen) override;
+	
 	string getAlgorithmName() override { return "HKDFBasedRO"; };
+
 };

@@ -34,8 +34,10 @@ void PrpFromPrfFixed::computePRFBlock(const vector<byte> & inBytes, int inOffset
 	
 	if (!isKeyDefined())
 		throw IllegalStateException("secret key isn't set");
+	
 	if ((inOffset > (int)inBytes.size()) || (inOffset + inLen > (int)inBytes.size()))
 		throw out_of_range("wrong offset for the given input buffer");
+	
 	if ((outOffset > (int)outBytes.size()) || (outOffset + outLen > (int)outBytes.size()))
 		throw out_of_range("wrong offset for the given output buffer");
 
@@ -51,8 +53,10 @@ void PrpFromPrfFixed::computePRFBlock(const vector<byte> & inBytes, int inOffset
 	
 	if (!isKeyDefined())
 		throw IllegalStateException("secret key isn't set");
+	
 	if ((inOffset > (int)inBytes.size()) || (inOffset + inLen > (int)inBytes.size()))
 		throw out_of_range("wrong offset for the given input buffer");
+	
 	if ((outOffset > (int)outBytes.size()) || (outOffset + getPRFBlockSize() > (int)outBytes.size()))
 		throw out_of_range("wrong offset for the given output buffer");
 
@@ -64,30 +68,36 @@ void PrpFromPrfFixed::computePRFBlock(const vector<byte> & inBytes, int inOffset
 
 }
 
-void PrpFromPrfFixed::invertBlock(const vector<byte> & inBytes, int inOffset, vector<byte>& outBytes, int outOffset, int len) {
+void PrpFromPrfFixed::invertPRFBlock(const vector<byte> & inBytes, int inOffset, vector<byte>& outBytes, int outOffset, int len) {
 	
 	if (!isKeyDefined())
 		throw IllegalStateException("secret key isn't set");
+	
 	// Checks that the offset and length are correct 
 	if ((inOffset > (int)inBytes.size()) || (inOffset + len > (int)inBytes.size()))
 		throw out_of_range("wrong offset for the given input buffer");
+	
 	if ((outOffset > (int)outBytes.size()) || (outOffset + len > (int)outBytes.size()))
 		throw out_of_range("wrong offset for the given output buffer");
+	
 	if (len == getPRFBlockSize()) //the length is correct
-		//Call the derived class implementation of invertBlock ignoring len
-		invertBlock(inBytes, inOffset, outBytes, outOffset);
+		//Call the derived class implementation of invertPRFBlock ignoring len
+		invertPRFBlock(inBytes, inOffset, outBytes, outOffset);
+	
 	else
 		throw out_of_range("the length should be the same as block size");
 
 }
 
 void IteratedPrfVarying::computePRFBlock(const vector<byte> & inBytes, int inOffset, int inLen, vector<byte> & outBytes, int outOffset, int outLen) {
+	
 	if (!isKeyDefined())
 		throw invalid_argument("secret key isn't set");
 	
 	// Checks that the offset and length are correct 
 	if ((inOffset > (int)inBytes.size()) || (inOffset + inLen >(int)inBytes.size()))
 		throw out_of_range("wrong offset for the given input buffer");
+	
 	if ((outOffset > (int)outBytes.size()) || (outOffset + outLen >(int)outBytes.size()))
 		throw out_of_range("wrong offset for the given output buffer");
 
@@ -120,6 +130,7 @@ void PrpFromPrfVarying::computePRFBlock(const vector<byte> & inBytes, int inOffs
 	
 	if (!isKeyDefined())
 		throw IllegalStateException("secret key isn't set");
+	
 	throw out_of_range("to use this prp, call the computeBlock function that specifies the block size length");
 
 }
@@ -128,9 +139,11 @@ void PrpFromPrfVarying::computePRFBlock(const vector<byte> & inBytes, int inOffs
 	
 	if (!isKeyDefined())
 		throw new IllegalStateException("secret key isn't set");
+	
 	// Check that the offsets and lengths are correct.
 	if ((inOffset > (int)inBytes.size()) || (inOffset + inLen > (int)inBytes.size()))
 		throw out_of_range("wrong offset for the given input buffer");
+	
 	if ((outOffset > (int)outBytes.size()) || (outOffset + outLen > (int)outBytes.size()))
 		throw out_of_range("wrong offset for the given output buffer");
 
@@ -142,10 +155,11 @@ void PrpFromPrfVarying::computePRFBlock(const vector<byte> & inBytes, int inOffs
 
 }
 
-void PrpFromPrfVarying::invertBlock(const vector<byte> & inBytes, int inOffset, vector<byte>& outBytes, int outOffset) {
+void PrpFromPrfVarying::invertPRFBlock(const vector<byte> & inBytes, int inOffset, vector<byte>& outBytes, int outOffset) {
 	
 	if (!isKeyDefined())
 		throw IllegalStateException("secret key isn't set");
-	throw out_of_range("to use this prp, call the invertBlock function which specify the block size length");
+	
+	throw out_of_range("to use this prp, call the invertPRFBlock function which specify the block size length");
 
 }

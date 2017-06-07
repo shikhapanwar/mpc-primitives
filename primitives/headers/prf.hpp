@@ -67,14 +67,14 @@ public:
 	* @param keyParams algorithmParameterSpec contains the required parameters for the key generation
 	* @return the generated secret key
 	*/
-	virtual SecretKey KeyGen(AlgorithmParameterSpec & keyParams)=0;
+	virtual SecretKey keyGen(AlgorithmParameterSpec & keyParams)=0;
 	
 	/**
 	* Generates a secret key to initialize this prf object.
 	* @param keySize is the required secret key size in bits
 	* @return the generated secret key
 	*/
-	virtual SecretKey KeyGen(int keySize)=0;
+	virtual SecretKey keyGen(int keySize)=0;
 	
 	/**
 	* Computes the function using the secret key.
@@ -146,7 +146,7 @@ public:
 	* @param outBytes output bytes. The resulted bytes of invert
 	* @param outOff output offset in the outBytes array to put the result from
 	*/
-	virtual void invertBlock(const vector<byte> & inBytes, int inOffset, vector<byte>& outBytes, int outOffset)=0;
+	virtual void invertPRFBlock(const vector<byte> & inBytes, int inOffset, vector<byte>& outBytes, int outOffset)=0;
 	
 	/**
 	* Inverts the permutation using the given key. 
@@ -158,7 +158,7 @@ public:
 	* @param outOff output offset in the outBytes array to put the result from
 	* @param len the length of the input and the output
 	*/
-	virtual void invertBlock(const vector<byte> & inBytes, int inOffset, vector<byte>& outBytes, int outOffset, int len) = 0;
+	virtual void invertPRFBlock(const vector<byte> & inBytes, int inOffset, vector<byte>& outBytes, int outOffset, int len) = 0;
 };
 
 /**
@@ -258,11 +258,11 @@ public:
 	* @param outOff output offset in the outBytes array to put the result from
 	* @param len the length of the input and the output.
 	*/
-	virtual void invertBlock(const vector<byte> & inBytes, int inOffset, vector<byte>& outBytes, int outOffset, int len) override;
+	virtual void invertPRFBlock(const vector<byte> & inBytes, int inOffset, vector<byte>& outBytes, int outOffset, int len) override;
 	
 	using PseudorandomFunction::computePRFBlock;
 	
-	using PseudorandomPermutation::invertBlock;
+	using PseudorandomPermutation::invertPRFBlock;
 
 };
 
@@ -355,9 +355,9 @@ public:
 	* 					that holds the necessary parameters to generate the key.
 	* @return the generated secret key
 	*/
-	 SecretKey KeyGen(AlgorithmParameterSpec & keyParams) override { 
+	 SecretKey keyGen(AlgorithmParameterSpec & keyParams) override { 
 	 
-	 	return prfVaryingInputLength->KeyGen(keyParams); 
+	 	return prfVaryingInputLength->keyGen(keyParams); 
 
 	 };
 	
@@ -366,9 +366,9 @@ public:
 	* @param keySize bit-length of required Secret Key
 	* @return the generated secret key
 	*/
-	 SecretKey KeyGen(int keySize) override { 
+	 SecretKey keyGen(int keySize) override { 
 
-	 	return prfVaryingInputLength->KeyGen(keySize); 
+	 	return prfVaryingInputLength->keyGen(keySize); 
 
 	 };
 
@@ -429,15 +429,27 @@ public:
 * This class implements some common functionality of PrpVaryingIOLength by having an instance of prfVaryingIOLength.
 */
 class PrpFromPrfVarying : public virtual PrpVaryingIOLength {
+
 protected:
 	shared_ptr<PrfVaryingIOLength> prfVaryingIOLength; // the underlying prf
+
 public:
 	/**
 	* Initializes this PrpFromPrfVarying with secret key
 	* @param secretKey the secret key
 	*/
-	void setPRFKey(SecretKey & secretKey) override { prfVaryingIOLength->setPRFKey(secretKey); };
-	bool isKeyDefined() override { return prfVaryingIOLength->isKeyDefined(); };
+	void setPRFKey(SecretKey & secretKey) override { 
+		
+		prfVaryingIOLength->setPRFKey(secretKey); 
+
+	};
+
+
+	bool isKeyDefined() override { 
+
+		return prfVaryingIOLength->isKeyDefined(); 
+
+	};
 	
 	/**
 	* Computes the function using the secret key.
@@ -464,13 +476,17 @@ public:
 	/**
 	* Throws an exception. The other invert block function that gets length should be called.
 	*/
-	void invertBlock(const vector<byte> & inBytes, int inOffset, vector<byte>& outBytes, int outOffset) override;
+	void invertPRFBlock(const vector<byte> & inBytes, int inOffset, vector<byte>& outBytes, int outOffset) override;
 
-	SecretKey KeyGen(AlgorithmParameterSpec & keyParams) override { return prfVaryingIOLength->KeyGen(keyParams); };
+	SecretKey keyGen(AlgorithmParameterSpec & keyParams) override { 
 
-	SecretKey KeyGen(int keySize) override {
+		return prfVaryingIOLength->keyGen(keyParams); 
 
-		 return prfVaryingIOLength->KeyGen(keySize);
+	};
+
+	SecretKey keyGen(int keySize) override {
+
+		 return prfVaryingIOLength->keyGen(keySize);
 
 	 };
 

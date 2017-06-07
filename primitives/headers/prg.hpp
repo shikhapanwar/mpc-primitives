@@ -62,6 +62,7 @@ public:
 		this->entropySource = entropySource;
 		this->prfKeySize = prfKeySize;
 	};
+
 	vector<byte> getEntropySource() { 
 		
 		return entropySource; 
@@ -83,6 +84,7 @@ public:
 * distributed string of that length.
 */
 class PseudorandomGenerator {
+
 public:
 	/**
 	* Sets the secret key for this prg.
@@ -106,14 +108,14 @@ public:
 	* @param keyParams algorithmParameterSpec contains the required parameters for the key generation
 	* @return the generated secret key
 	*/
-	virtual SecretKey KeyGen(AlgorithmParameterSpec & keyParams)=0;
+	virtual SecretKey keyGen(AlgorithmParameterSpec & keyParams)=0;
 	
 	/**
 	* Generates a secret key to initialize this prg object.
 	* @param keySize is the required secret key size in bits
 	* @return the generated secret key
 	*/
-	virtual SecretKey KeyGen(int keySize)=0;
+	virtual SecretKey keyGen(int keySize)=0;
 	
 	/**
 	* Streams the prg bytes.
@@ -121,7 +123,7 @@ public:
 	* @param outOffset - output offset
 	* @param outlen - the required output length
 	*/
-	virtual void getPRGBytes(vector<byte> & outBytes, int outOffset, int outlen)=0;
+	virtual void streamPRGBytes(vector<byte> & outBytes, int outOffset, int outlen)=0;
 
 };
 
@@ -176,19 +178,19 @@ public:
 
 	};
 
-	SecretKey KeyGen(AlgorithmParameterSpec & keyParams) override { 
+	SecretKey keyGen(AlgorithmParameterSpec & keyParams) override { 
 		
-		return prf->KeyGen(keyParams); 
+		return prf->keyGen(keyParams); 
 
 	};
 
-	SecretKey KeyGen(int keySize) override { 
+	SecretKey keyGen(int keySize) override { 
 		
-		return prf->KeyGen(keySize); 
+		return prf->keyGen(keySize); 
 
 	};
 	
-	void getPRGBytes(vector<byte> & outBytes, int outOffset, int outLen) override;
+	void streamPRGBytes(vector<byte> & outBytes, int outOffset, int outLen) override;
 
 
 };
@@ -203,6 +205,7 @@ public:
 * key, they generated the same randoms.
 */
 class PrgFromAES : public PseudorandomGenerator {
+
 private:
 	// Counter used for key generation.
 	block iv = _mm_setzero_si128();
@@ -237,6 +240,7 @@ public:
 	
 	//move constructor
 	PrgFromAES(PrgFromAES&& old);
+	
 	//copy constructor - not allowed to prevent unneccessary copy of arrays.
 	PrgFromAES(PrgFromAES& other) = delete;
 
@@ -262,13 +266,13 @@ public:
 
 	};
 
-	SecretKey KeyGen(AlgorithmParameterSpec & keyParams) override {
+	SecretKey keyGen(AlgorithmParameterSpec & keyParams) override {
 		
 		throw NotImplementedException("To generate a key for this prg object use the generateKey(int keySize) function");
 	
 	}
 
-	SecretKey KeyGen(int keySize) override;
+	SecretKey keyGen(int keySize) override;
 
 	/**
 	* Fill the out vector with random bytes. This bytes are set to used and will not be used again
@@ -276,7 +280,7 @@ public:
 	* @param outOffset - output offset
 	* @param outlen - the required output length
 	*/
-	void getPRGBytes(vector<byte> & outBytes, int outOffset, int outLen) override;
+	void streamPRGBytes(vector<byte> & outBytes, int outOffset, int outLen) override;
 
 	/**
 	* @returns a random variable of the required length (32,64,128). This bytes are set to used and will not be used again
@@ -294,7 +298,7 @@ public:
 	*
 	* If isStrict is set to true an exception is thrown
 	*/
-	void prepare();
+	void genRandomness();
 
 };
 
@@ -330,7 +334,7 @@ public:
 	static shared_ptr<PrgFromAES> getInstance() { 
 		if (prg == nullptr) {
 			prg = make_shared<PrgFromAES>();
-			auto key = prg->KeyGen(128);
+			auto key = prg->keyGen(128);
 			prg->setPRGKey(key);
 		}
 		return prg; 

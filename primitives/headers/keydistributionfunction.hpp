@@ -51,7 +51,7 @@ private:
 	* @param outBytes the result of the overall computation
 	* @param intermediateOutBytes round result K(i) in the pseudocode
 	*/
-	void nextRounds(int outLen, const vector<byte> & iv, int hmacLength, vector<byte> & outBytes, vector<byte> & intermediateOutBytes);
+	void ithRound(int outLen, const vector<byte> & iv, int hmacLength, vector<byte> & outBytes, vector<byte> & intermediateOutBytes);
 	
 	/**
 	* First round of HKDF algorithm. The pseudo code:
@@ -61,7 +61,7 @@ private:
 	* @param outLength the size of the output of the hmac.
 	* @param outBytes the result of the overall computation
 	*/
-	void firstRound(vector<byte>& outBytes, const vector<byte> & iv, vector<byte> & intermediateOutBytes, int outLength);
+	void initialRound(vector<byte>& outBytes, const vector<byte> & iv, vector<byte> & intermediateOutBytes, int outLength);
 
 public:
 	HKDF(const shared_ptr<Hmac> & hmac = make_shared<OpenSSLHMAC>()) { this->hmac = hmac; };
