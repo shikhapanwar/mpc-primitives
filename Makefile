@@ -52,7 +52,7 @@ core:${OBJECTS_CORE}
 	${CC} -c $< ${COMPILER_OPTIONS} ${CFLAGS} ${DEBUG_OPTIONS} ${LIBRARIES}-o $@
 
 bench:  
-	${CC} -o test.exe test.cpp ${OBJECTS_PRIM} ${OBJECTS_MIRACL} ${CFLAGS} ${DEBUG_OPTIONS} ${LIBRARIES} ${MIRACL_LIB} ${INCLUDE} ${COMPILER_OPTIONS} #${OBJECTS_UTIL}
+	${CC} -o test.exe test.cpp ${OBJECTS_PRIM} ${OBJECTS_MIRACL} ${CFLAGS} ${DEBUG_OPTIONS} ${LIBRARIES} ${MIRACL_LIB} ${INCLUDE} ${COMPILER_OPTIONS} ${OBJECTS_UTIL}
 
 
 # this will create a copy of the files in ${SOURCES_MIRACL} and its sub-directories and put them into ${MIRACL_LIB_DIR} without sub-directories, then compile it
