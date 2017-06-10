@@ -127,8 +127,7 @@ void MsgVector::setBitsToZero(int bitpos, int bitlen){
 
 /*PRINT METHODS*/
 	/*print from index fromBit to index toBit*/
-	void MsgVector::print(int fromBit, int toBit)
-	{
+	void MsgVector::print(int fromBit, int toBit){
 		if (toBit>(msg_size << 3))
 			cout<< "Not in range"<<endl;
 		else
@@ -139,15 +138,13 @@ void MsgVector::setBitsToZero(int bitpos, int bitlen){
 		}
 	}
 
-	void MsgVector::printHex()
-	{
+	void MsgVector::printHex(){
 		for(int i=0;i<msg_size;i++)
 			cout << setw(2) << setfill('0') << (hex) << ((unsigned int) msg_ptr[i]);
 		cout<<endl;
 	}
 
-	void MsgVector::printHex(int fromByte, int toByte)
-	{
+	void MsgVector::printHex(int fromByte, int toByte){
 		if(toByte>msg_size)
 			cout<<"Not in range"<<endl;
 		else
@@ -158,12 +155,10 @@ void MsgVector::setBitsToZero(int bitpos, int bitlen){
 		}
 	}
 
-	void MsgVector::printContent()
-	{
+	void MsgVector::printContent(){
 
 	}
 
-	void MsgVector::printBinaryMasked(int from, int to)
-	{
+	void MsgVector::printBinaryMasked(int from, int to){
 
 	}

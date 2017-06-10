@@ -4,7 +4,6 @@ SRC=primitives
 
 # compiler settings
 CC=g++
-#COMPILER_OPTIONS=-O2
 COMPILER_OPTIONS= -std=c++11#-fPIC -mavx -maes -mpclmul -DRDTSC -DTEST=AES128
 
 DEBUG_OPTIONS=-g3 -ggdb #-Wall -Wextra 
@@ -27,7 +26,7 @@ LIBRARIES=-lgmp -lgmpxx -lpthread  -L /usr/lib  -lssl -lcrypto #-lglib-2.0 `pkg-
 CFLAGS= -lboost_system -lboost_filesystem
 
 # all source files and corresponding object files 
-SOURCES_CORE := $(shell find ${CORE} -type f -name '*.cpp' -not -path '*/Miracl/*')
+SOURCES_CORE := $(shell find ${CORE} -type f -name '*.cpp' -not -path '*/Miracl/*' -not -path '*./test.cpp')
 OBJECTS_CORE := $(SOURCES_CORE:.cpp=.o)
 # directory for primitives src
 SOURCES_PRIM=${SRC}/src/*.cpp
@@ -45,12 +44,13 @@ MIRACL_LIB=${SRC}/externals/miracl_lib/miracl.a
 all: miracl core bench
 	@echo "make all done."
 
-
+# this will compile all files amd create the object file
 core:${OBJECTS_CORE}
 
 %.o:%.cpp
 	${CC} -c $< ${COMPILER_OPTIONS} ${CFLAGS} ${DEBUG_OPTIONS} ${LIBRARIES}-o $@
 
+# The test program compiled and create the binary
 bench:  
 	${CC} -o test.exe test.cpp ${OBJECTS_PRIM} ${OBJECTS_MIRACL} ${CFLAGS} ${DEBUG_OPTIONS} ${LIBRARIES} ${MIRACL_LIB} ${INCLUDE} ${COMPILER_OPTIONS} ${OBJECTS_UTIL}
 

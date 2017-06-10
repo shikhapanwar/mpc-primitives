@@ -42,6 +42,9 @@ static const byte MASK_BIT[8] =
 
 static const byte BIT[8] =
 { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80 };
+//compliment of BIT
+static const byte C_BIT[8] =
+	{ 0xfe, 0xfd, 0xfb, 0xf7, 0xef, 0xdf, 0xbf, 0x7f };
 
 static const byte CMASK_BIT[8] =
 { 0x7f, 0xbf, 0xdf, 0xef, 0xf7, 0xfb, 0xfd, 0xfe };
@@ -49,8 +52,6 @@ static const byte CMASK_BIT[8] =
 static const byte MASK_SET_BIT_C[2][8] =
 { {0x80, 0x40, 0x20, 0x10, 0x8, 0x4, 0x2, 0x1},{0,0,0,0,0,0,0,0} };
 
-static const byte C_BIT[8] =
-	{ 0xFE, 0xFD, 0xFB, 0xF7, 0xEF, 0xDF, 0xBF, 0x7F };
 
 static const byte SET_BIT_C[2][8] =
 { {0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80},{0,0,0,0,0,0,0,0} };
@@ -69,6 +70,16 @@ class MsgVector{
 		}
 		MsgVector(int bits){
 			create(bits);
+		}
+		~MsgVector(){
+			delMsgVector();
+		}
+		void delMsgVector() {
+			if (( msg_size > 0 )&& (msg_ptr != NULL)) {
+				free(msg_ptr);
+			}
+			msg_size = 0;
+			msg_ptr = NULL;
 		}
 		//overloaded create functions
 		//default initialization setting size to 0 and ptr to NULL
@@ -95,11 +106,12 @@ class MsgVector{
 			memset(msg_ptr, 0, msg_size);
 		}
 		void resetFromTo(int frombyte, int tobyte) {
-			assert(frombyte>tobyte);
+			assert(frombyte >= tobyte);
+			assert(tobyte > msg_size);
 			memset(msg_ptr+frombyte, 0x00, tobyte-frombyte);
 		}
 		void setToOne() {
-			memset(msg_ptr, 0xFF, msg_size);
+			memset(msg_ptr, 0xff, msg_size);
 		}
 		int getSize(){
 			return msg_size;
@@ -110,7 +122,6 @@ class MsgVector{
 		void resizeinBytes(int newsize);
 		bool isEqual(MsgVector& vec);
 		bool isEqual(MsgVector& vec, int from, int to);
-		//invert complete message
 		void invert();
 
 
@@ -126,7 +137,7 @@ class MsgVector{
 		void copy(byte* p, int pos, int len);
 
 
-
+		//not requerd I guess; implement only if required.
 		//void XOR_no_mask(int p, int bitPos, int bitLen);
 		//unsigned int GetInt(int bitPos, int bitLen);
 
@@ -182,7 +193,7 @@ class MsgVector{
 		}
 
 		/*
-		 * Get Operations
+		 * Get Operations TODO
 		 */
 		//void getBits(byte* p, int pos, int len);
 		//void getBytes(byte* p, int pos, int len);
